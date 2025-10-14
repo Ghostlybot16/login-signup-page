@@ -1,0 +1,107 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", system-ui, sans-serif;
+    color: #1a1a1a;
+    background-color: #f7f8fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.auth-container {
+    display: flex;
+    width: 90%;
+    max-width: 1100px;
+    height: 650px;
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+}
+
+/* Left Panel */
+.auth-left {
+    flex: 1;
+    background: url("./assets/forest.jpg") center/cover no-repeat;
+    position: relative;
+}
+
+.auth-left::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.company-logo {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    width: 100px;
+    z-index: 2;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+}
+
+/* Right Panel */
+.auth-right {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    background-color: #fff;
+}
+
+.form-wrapper {
+    max-width: 400px;
+    width: 100%;
+}
+
+.form-wrapper h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.subtext {
+    font-size: 0.9rem;
+    color: #555;
+    margin-bottom: 40px;
+}
+
+.subtext a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.subtext a:hover {
+    text-decoration: underline;
+}
+
+/* Placeholder {temporary} */
+.form-placeholder {
+    border: 1px dashed #ccc;
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    background: #fafafa;
+    color: #666;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .auth-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .auth-left {
+        height: 200px;
+    }
+}
