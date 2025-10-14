@@ -28,24 +28,33 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" placeholder="John" required>
+                            <input type="text" id="firstName" name="firstName" autocomplete="new-password" placeholder="John" required>
                         </div>
 
                         <div class="form-group">
                             <label form="lastName">Last Name</label>
-                            <input type="text" id="lastName" name="lastName" placeholder="Doe" required>
+                            <input type="text" id="lastName" name="lastName" autocomplete="new-password" placeholder="Doe" required>
                         </div>
                     </div>
 
 
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" placeholder="Email ID" required>
+                        <input type="email" id="email" name="email" autocomplete="new-password" placeholder="email@example.com" required>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            autocomplete="new-password"
+                            spellcheck="false"
+                            autocapitalize="off"
+                            placeholder="••••••••" 
+                            required
+                        />
                     </div>
 
                     <div class="form-check">
@@ -53,22 +62,22 @@
                         <label for="terms">I agree to the <a href="#">Terms &amp; Conditions</a></label>
                     </div>
 
-                    <button type="submit" class="btn-primary">Create Account</button>
+                    <button type="submit" class="btn-primary"><strong>Create Account</strong></button>
 
                     <div class="divider">
                         <span>or</span>
                     </div>
 
 
-                    <div class="social-buttons">
+                    <div class="social-buttons-container">
                         <button type="button" class="btn-social google">
-                            <img src="./assets/google_logo.svg" alt="Google logo" width="20" height="20" aria-hidden="true">
-                            &nbsp;Continue with Google
+                            <img src="./assets/google_logo.svg" alt="Google logo" width="30" height="30" aria-hidden="true">
+                            <span>Continue with Google</span>
                         </button>
 
                         <button type="button" class="btn-social facebook">
-                            <img src="./assets/facebook_logo.svg" alt="Facebook logo" width="20" height="20" aria-hidden="true">
-                            &nbsp;Continue with Facebook
+                            <img src="./assets/facebook_logo.svg" alt="Facebook logo" width="35" height="35" aria-hidden="true">
+                            <span>Continue with Facebook</span>
                         </button>
                     </div>
                 </form>
