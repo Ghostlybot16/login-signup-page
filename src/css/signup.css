@@ -57,7 +57,7 @@ body {
     /* flex: 1; */
     flex: 1 1 560px;
     min-width: 460px;
-    background: url("./assets/forest.jpg") center/cover no-repeat;
+    background: url("./../../assets/images/signup_splashart.jpg") center/cover no-repeat;
     position: relative;
 }
 
@@ -335,7 +335,7 @@ body {
     cursor: pointer;
 
     /* icon */
-    background-image: url("./assets/view_password_eye.svg");
+    background-image: url("./../../assets/icons/view_password_eye.svg");
     background-repeat: no-repeat;
     background-position: center;
     background-size: 20px 20px;
@@ -343,7 +343,7 @@ body {
 
 /* When password is visible to user, show the closed eye icon */
 .toggle-pass.is-on{
-    background-image: url("./assets/disable_view_password_eye.svg");
+    background-image: url("./../../assets/icons/disable_view_password_eye.svg");
 }
 
 .toggle-pass:hover { background-color: rgba(0, 0, 0, 0.04); border-radius: 8px; }
