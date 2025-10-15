@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from .database import engine
+
 app = FastAPI(title="Signup/Login Backend")
 
 # Allow front end requests 
@@ -15,4 +17,6 @@ app.add_middleware(
 # Root route
 @app.get("/")
 def root():
-    return {"message": "Backend is running successfully!"}
+    return {"message": "Backend is running successfully!"} 
+
+print("Database engine connected:", engine)
