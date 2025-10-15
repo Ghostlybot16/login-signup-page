@@ -7,13 +7,20 @@
 body {
     font-family: "Inter", system-ui, sans-serif;
     color: #1a1a1a;
-    background-color: #f8f6f6;
+    background: #f8f6f6;
+    background: radial-gradient(1200px 800px at 70% 40%,
+                #ffffff 0%, #f5f7fa 50%, #ebeff5 100%);
     min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 16px;
     overflow: auto;
+}
+
+:root{
+    --auth-min-h: clamp(620px, 72vh, 760px);
+    --card-shadow: 0 30px 80px rgba(0, 0, 0, 0.16), 0 6px 20px rgba(0, 0, 0, 0.06);
 }
 
 .skip-link{
@@ -44,12 +51,15 @@ body {
     align-items: stretch;
     gap: 0;
     width: min(98vw, 1460px);
+    height: min(98vw, 930px);
     min-width: 340px;
     background: #fff;
     border-radius: 28px;
     overflow: hidden;
-    border: 2px solid #dfe2e6;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.10);
+    /* border: 2px solid #dfe2e6;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.10); */
+    border: 2px solid #e7eaee;
+    box-shadow: var(--card-shadow);
 }
 
 /* Left Panel */
