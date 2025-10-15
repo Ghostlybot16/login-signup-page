@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Log in | Company</title>
+
+    <!-- Reuse base styles from signup + page-specific design overrides -->
+    <link rel="stylesheet" href="./../css/signup.css"/>
+    <link rel="stylesheet" href="./../css/login.css"/>
+    <script src="./../js/login.js" defer></script>
+</head>
+
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <main id="main" role="main">
+        <div class="auth-container">
+            <!-- Left Splash Art -->
+            <div class="auth-left auth-left--login" role="img" aria-label="Dark single tall tree">
+                <img src="./../../assets/images/company_logo.png" alt="Company logo" class="company-logo"/>
+            </div>
+
+            <!-- Right Panel Form -->
+            <div class="auth-right">
+                <div class="form-wrapper">
+                    <h1>Log in</h1>
+                    <p class="subtext">Don't have an account? <a href="./signup.html">Create an Account</a></p>
+
+                    <form id="loginForm" class="login-form" novalidate>
+                        <!-- SR error banner -->
+                        <div id="formError" class="form-error" role="alert" aria-live="polite" aria-atomic="true"></div>
+
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                autocomplete="email" 
+                                placeholder="name@example.com" 
+                                required 
+                                aria-describedby="emailError"
+                            />
+                            <p class="field-error" id="emailError" aria-live="polite"></p>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <div class="password-field">
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    autocomplete="current-password"
+                                    spellcheck="false"
+                                    autocapitalize="off"
+                                    placeholder="••••••••"
+                                    required
+                                    aria-describedby="passwordError"
+                                    readonly
+                                    onfocus="this.removeAttribute('readonly');"
+                                />
+                                <button type="button" class="toggle-pass" aria-label="Show password" aria-pressed="false"></button>
+                            </div>
+                            <p class="field-error" id="passwordError" aria-live="polite"></p>
+                            <div class="muted-row">
+                                <a class="small-link" href="#" aria-label="Forgot Password">Forgot Password?</a>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-primary"><strong>Log in</strong></button>
+
+                        <div class="divider" aria-hidden="true">
+                            <span>OR</span>
+                        </div>
+                        <p class="sr-only" id="socialLabel">Or continue with a social account</p>
+
+                        <div class="social-buttons-container" aria-labelledby="socialLabel">
+                            <button type="button" class="btn-social google" aria-label="Continue with Google">
+                                <img src="./../../assets/icons/google_logo.svg" alt="" width="30" height="30" aria-hidden="true"/>
+                                <span>Continue with Google</span>
+                            </button>
+
+                            <button type="button" class="btn-social facebook" aria-label="Continue with Facebook">
+                                <img src="./../../assets/icons/facebook_logo.svg" alt="" width="35" height="35" aria-hidden="true" />
+                                <span>Continue with Facebook</span>
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div> 
+        </div>
+    </main>
+</body>
+
+</html>

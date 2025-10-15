@@ -1,0 +1,28 @@
+/*  Most of the design elements are taken from signup.css
+    This file only contains login-only design changes. 
+*/
+
+.auth-left--login {
+    background: url("./../../assets/images/login_splashart.jpg") center/cover no-repeat;
+}
+.auth-left--login::after {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+.login-form {
+    display: grid;
+    gap: 18px;
+}
+
+.muted-row {
+    margin-top: 8px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.small-link {
+    font-size: 0.88rem;
+    color: #5b6470;
+    text-decoration: none;
+}
+.small-link:hover { text-decoration: underline; }
