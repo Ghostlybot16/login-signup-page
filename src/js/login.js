@@ -10,6 +10,10 @@ const inputs = {
 const toggleBtn = $('.toggle-pass');
 const formError = $('#formError');
 
+const rememberBox = $('#rememberMe');
+const statusEl = $('#loginStatus');
+const submitBtn = form.querySelector('.btn-primary');
+
 const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 };
@@ -79,8 +83,26 @@ toggleBtn.addEventListener('click', () => {
     toggleBtn.setAttribute('aria-label', visible ? 'Hide Password' : 'Show password');
 })();
 
+// Restore remembered email if exists
+(function restoreRemembered() {
+    try {
+        const remembered = localStorage.getItem('auth:rememberEmail');
+        if (remembered) {
+            inputs.email.value = remembered;
+            rememberBox.checked = true;
+        }
+    } catch (e) {}
+})();
+
+// Loading helper
+function setLoading(on) {
+    submitBtn.classList.toggle('is-loading', on);
+    submitBtn.disabled = on;
+    if (statusEl) statusEl.textContent = on ? 'Signing you in...' : '';
+}
+
 // Submit 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!validateForm()) {
         const firstBadLabel = form.querySelector('.has-error label')?.textContent?.trim() || 'form';
@@ -88,10 +110,25 @@ form.addEventListener('submit', (e) => {
         form.querySelector('.has-error input')?.focus();
         return;
     }
+
+    // Remember email
+    try {
+        if (rememberBox?.checked) {
+            localStorage.setItem('auth:rememberEmail', inputs.email.value.trim());
+        } else {
+            localStorage.removeItem('auth:rememberEmail');
+        }
+    } catch (e) {}
+
     formError.textContent = '';
-    const payload = { email: inputs.email.value.trim() };
-    console.log('Login payload (demo):', payload);
-    alert('Logged in! (frontend demo)');
+    setLoading(true);
+    try {
+        await new Promise(r => setTimeout(r, 1000));
+        console.log('Login payload (demo):', { email: inputs.email.value.trim() });
+        alert('Logged in! (frontend demo)');
+    } finally {
+        setLoading(false);
+    }
 });
 
 // Clear sensitive information on load/BFCache restore

@@ -37,7 +37,8 @@
                                 type="email" 
                                 id="email" 
                                 name="email" 
-                                autocomplete="email" 
+                                autocomplete="username"
+                                inputmode="email" 
                                 placeholder="name@example.com" 
                                 required 
                                 aria-describedby="emailError"
@@ -64,18 +65,27 @@
                                 <button type="button" class="toggle-pass" aria-label="Show password" aria-pressed="false"></button>
                             </div>
                             <p class="field-error" id="passwordError" aria-live="polite"></p>
-                            <div class="muted-row">
+                            
+                            <!-- Remember Me and Forgot Password -->
+                            <div class="muted-row-between">
+                                <label>
+                                    <input type="checkbox" id="rememberMe" />
+                                    Remember Me
+                                </label>
                                 <a class="small-link" href="#" aria-label="Forgot Password">Forgot Password?</a>
                             </div>
                         </div>
-
+                        
+                        <!-- Log in Button -->
                         <button type="submit" class="btn-primary"><strong>Log in</strong></button>
+                        <p id="loginStatus" class="muted-hint" aria-live="polite"></p>
 
                         <div class="divider" aria-hidden="true">
                             <span>OR</span>
                         </div>
                         <p class="sr-only" id="socialLabel">Or continue with a social account</p>
 
+                        <!-- Social Buttons  -->
                         <div class="social-buttons-container" aria-labelledby="socialLabel">
                             <button type="button" class="btn-social google" aria-label="Continue with Google">
                                 <img src="./../../assets/icons/google_logo.svg" alt="" width="30" height="30" aria-hidden="true"/>

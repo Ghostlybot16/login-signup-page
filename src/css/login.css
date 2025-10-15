@@ -19,10 +19,14 @@
     .auth-left--login{ background-position: 50% 20%; }
 }
 
-.muted-row {
+.muted-row-between {
     margin-top: 8px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.92rem;
+    color: #444;
 }
 
 .small-link {
@@ -31,3 +35,18 @@
     text-decoration: none;
 }
 .small-link:hover { text-decoration: underline; }
+
+.muted-hint {
+    margin-top: 8px;
+    font-size: 0.9rem;
+    color: #6a7280;
+}
+
+/* Loading state for button */
+.btn-primary.is-loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+.btn-primary.is-loading::before{
+    transform: scaleX(1);
+}
