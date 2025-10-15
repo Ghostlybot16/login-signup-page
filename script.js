@@ -12,6 +12,7 @@ const inputs = {
 
 const btnSubmit = $('.btn-primary');
 const toggleBtn = $('.toggle-pass');
+const formError = document.getElementById('formError');
 
 const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
@@ -25,9 +26,11 @@ function setError(inputEl, message = '') {
     const errEl = document.getElementById(errId);
     if (message) {
         group.classList.add('has-error');
+        inputEl.setAttribute('aria-invalid', 'true');
         if (errEl) errEl.textContent = message;
     } else {
         group.classList.remove('has-error');
+        inputEl.removeAttribute('aria-invalid');
         if (errEl) errEl.textContent = '';
     }
 }
@@ -84,20 +87,40 @@ updateSubmitState();
 // Password show/hide
 toggleBtn.addEventListener('click', () => {
     if (!inputs.password) return;
+
     const isText = inputs.password.type === 'text';
-    inputs.password.type = isText ? 'password' : 'text';
-    toggleBtn.classList.toggle('is-on', !isText);
-    toggleBtn.setAttribute('aria-label', isText ? 'Show password' : 'Hide password');
+    const nowOn = !isText; // "on" means password is visible
+
+    inputs.password.type = nowOn ? 'text' : 'password';
+    toggleBtn.classList.toggle('is-on', nowOn);
+    toggleBtn.setAttribute('aria-pressed', String(nowOn));
+    toggleBtn.setAttribute('aria-label', nowOn ? 'Hide password' : 'Show password');
 });
+
+// Ensure ARIA matches the current input type 
+(function initPasswordToggleState() {
+    if (!inputs.password || !toggleBtn) return;
+    const visible = inputs.password.type === 'text';
+    toggleBtn.classList.toggle('is-on', visible);
+    toggleBtn.setAttribute('aria-pressed', String(visible));
+    toggleBtn.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+})();
 
 // Submit handler
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     const ok = validateForm();
+
     if (!ok) {
+        if (formError) {
+            const firstBadLabel = form.querySelector('.has-error label')?.textContent?.trim() || 'form';
+            formError.textContent = `Please correct the highlighted fields. First issue: ${firstBadLabel}.`;
+        }
         const firstInvalid = form.querySelector('.has-error input');
         if (firstInvalid) firstInvalid.focus();
         return;
+    } else {
+        if (formError) formError.textContent = ''; // Clear banner on success
     }
 
     const payload = {
@@ -108,4 +131,27 @@ form.addEventListener('submit', (e) => {
     console.log('Signup payload (demo):', payload);
     alert('Account created! (frontend demo)');
 
+});
+
+// Clear sensitive fields on load or when page is restored from bfcache (back/forward)
+function clearSensitive(){
+    if (inputs.password) {
+        inputs.password.value = '';
+        
+        // Make sure it's back to password mode and the toggle is reset
+        inputs.password.type = 'password';
+        if (toggleBtn) {
+            toggleBtn.classList.remove('is-on');
+            toggleBtn.setAttribute('aria-pressed', 'false');
+            toggleBtn.setAttribute('aria-label', 'Show password');
+        }
+    }
+    if (inputs.terms) inputs.terms.checked = false;
+    
+    updateSubmitState();
+}
+
+document.addEventListener('DOMContentLoaded', clearSensitive);
+window.addEventListener('pageshow', (e) => {
+    if (e.persisted) clearSensitive();
 });
