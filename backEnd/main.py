@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine
+from . import models
 
 app = FastAPI(title="Signup/Login Backend")
 
