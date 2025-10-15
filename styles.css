@@ -18,10 +18,9 @@ body {
     display: flex;
     width: 90%;
     max-width: 1100px;
-    height: 650px;
+    height: 800px;
     background: #fff;
     border-radius: 28px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     border: 2px solid #dfe2e6;
     box-shadow: 0 24px 60px rgba(0,0,0,0.10);
@@ -100,16 +99,6 @@ body {
 .subtext a:hover { color: #0949b2; }
 .subtext a:hover::after { transform: scaleX(1); }
 
-/* Placeholder {temporary} */
-.form-placeholder {
-    border: 1px dashed #ccc;
-    padding: 1.5rem;
-    border-radius: 10px;
-    text-align: center;
-    background: #fafafa;
-    color: #666;
-}
-
 /* Responsive */
 @media (max-width: 900px) {
     .auth-container {
@@ -156,7 +145,6 @@ body {
 }
 
 .form-group input::placeholder { color: #9aa3ae; }
-
 .form-group input:focus {
     outline: none;
     border-color: #0b57d0;
@@ -207,6 +195,12 @@ body {
 .btn-primary strong,
 .btn-primary { position: relative; z-index: 1; }
 
+/* Disabled submit state */
+.btn-primary:disabled{
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* divider "or" */
 .divider {
     position: relative;
@@ -244,8 +238,7 @@ body {
     position: relative;
     overflow: hidden;
     padding: 12px 14px;
-    border: 20px solid #d9dee5;
-    border-width: 1.5px;
+    border: 1.5px solid #d9dee5;
     background: #fff;
     border-radius: 999px;
     cursor: pointer;
@@ -260,9 +253,10 @@ body {
     transform-origin: left;
     transition: transform .3s ease;
     pointer-events: none;
+    z-index: 0;
 }
 
-.btn-social:hover::before{ transform: scaleX(1) }
+.btn-social:hover::before{ transform: scaleX(1); }
 
 .btn-social img,
 .btn-social span,
@@ -271,9 +265,57 @@ body {
     z-index: 1;
 }
 
-.btn-social img{
-    flex-shrink: 0;
+.btn-social img{ flex-shrink: 0; }
+
+/* --- Password view toggle + error styles */
+.password-field { position: relative; }
+.password-field input { 
+    width: 100%; 
+    padding-right: 42px; 
 }
+
+.toggle-pass{
+    position: absolute;
+    right: 10px; 
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+
+    /* icon */
+    background-image: url("./assets/view_password_eye.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 20px 20px;
+}
+
+/* When password is visible to user, show the closed eye icon */
+.toggle-pass.is-on{
+    background-image: url("./assets/disable_view_password_eye.svg");
+}
+
+.toggle-pass:hover { background-color: rgba(0, 0, 0, 0.04); border-radius: 8px; }
+
+.toggle-pass:focus{
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(11, 87, 208, 0.18);
+}
+
+.field-error{
+    min-height: 18px;
+    margin-top: 6px;
+    font-size: 0.85rem;
+    color: #b42318;
+}
+.has-error input{
+    border-color: #e5484d !important;
+    box-shadow: 0 0 0 3px rgba(229, 72, 77, 0.12) !important;
+}
+
 
 @media (prefers-reduced-motion: reduce) {
     .subtext a::after,

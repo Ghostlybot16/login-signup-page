@@ -28,33 +28,69 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="firstName">First Name</label>
-                            <input type="text" id="firstName" name="firstName" autocomplete="new-password" placeholder="John" required>
+                            <input 
+                                type="text" 
+                                id="firstName" 
+                                name="firstName" 
+                                autocomplete="new-password" 
+                                placeholder="John" 
+                                required
+                                aria-describedby="firstNameError"
+                            />
+                            <p class="field-error" id="firstNameError" aria-live="polite"></p>
                         </div>
 
                         <div class="form-group">
                             <label form="lastName">Last Name</label>
-                            <input type="text" id="lastName" name="lastName" autocomplete="new-password" placeholder="Doe" required>
+                            <input 
+                                type="text" 
+                                id="lastName" 
+                                name="lastName" 
+                                autocomplete="new-password" 
+                                placeholder="Doe" 
+                                required
+                                aria-describedby="lastNameError"
+                            />
+                            <p class="field-error" id="lastNameError" aria-live="polite"></p>
                         </div>
                     </div>
 
 
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input type="email" id="email" name="email" autocomplete="new-password" placeholder="email@example.com" required>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            autocomplete="new-password" 
+                            placeholder="email@example.com" 
+                            required
+                            aria-describedby="emailError"
+                        />
+                        <p class="field-error" id="emailError" aria-live="polite"></p>
                     </div>
 
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            autocomplete="new-password"
-                            spellcheck="false"
-                            autocapitalize="off"
-                            placeholder="••••••••" 
-                            required
-                        />
+                        
+                        <div class="password-field">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                autocomplete="new-password"
+                                spellcheck="false"
+                                autocapitalize="off"
+                                placeholder="••••••••" 
+                                required
+                                aria-describedby="passwordError"
+                                readonly
+                                onfocus="this.removeAttribute('readonly');"
+                            />
+                            <button type="button" class="toggle-pass" aria-label="Show password"></button>
+                        </div>
+
+                        <p class="field-error" id="passwordError" aria-live="polite"></p>
                     </div>
 
                     <div class="form-check">
