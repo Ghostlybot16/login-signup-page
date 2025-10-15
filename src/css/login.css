@@ -4,6 +4,7 @@
 
 .auth-left--login {
     background: url("./../../assets/images/login_splashart.jpg") center/cover no-repeat;
+    background-position: 50% 18%;
 }
 .auth-left--login::after {
     background: rgba(0, 0, 0, 0.45);
@@ -12,6 +13,10 @@
 .login-form {
     display: grid;
     gap: 18px;
+}
+
+@media (max-width: 1040px){
+    .auth-left--login{ background-position: 50% 20%; }
 }
 
 .muted-row {
