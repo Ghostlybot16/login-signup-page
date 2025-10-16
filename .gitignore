@@ -6,3 +6,6 @@ backEnd/__pycache__/
 
 # Ignore DB creation files 
 backEnd/users.db
+
+# Ignore .env file 
+backEnd/.env
