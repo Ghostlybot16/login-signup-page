@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard | Company</title>
+
+  <link rel="stylesheet" href="./../css/signup.css"/>
+  <link rel="stylesheet" href="./../css/dashboard.css"/>
+
+  <script src="./../js/api.js" defer></script>
+  <script src="./../js/dashboard.js" defer></script>
+</head>
+<body class="dash-body">
+    <div class="dash-shell">
+          <!-- Main Content  -->
+          <main class="dash-main" id="main" role="main">
+            <p class="dash-greeting" id="greeting">Hello there</p>
+            <h2 class="dash-section-title">My Dashboard</h2>
+
+            <section class="dash-card">
+                <p class="dash-muted">This is your dashboard area. Add widgets here!</p>
+            </section>
+          </main>
+
+          <!-- Bottom bar -->
+           <footer class="dash-footer">
+            <button id="logoutBtn" class="btn-logout" type="button" aria-label="Log out">Log out</button>
+           </footer>
+    </div>
+</body>
+</html>

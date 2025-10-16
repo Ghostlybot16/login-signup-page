@@ -106,8 +106,13 @@ toggleBtn.addEventListener('click', () => {
     toggleBtn.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
 })();
 
+function setLoading(on) {
+    btnSubmit.disabled = on || !inputs.terms.checked;
+    btnSubmit.classList.toggle('is-loading', on);
+}
+
 // Submit handler
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const ok = validateForm();
 
@@ -116,20 +121,37 @@ form.addEventListener('submit', (e) => {
             const firstBadLabel = form.querySelector('.has-error label')?.textContent?.trim() || 'form';
             formError.textContent = `Please correct the highlighted fields. First issue: ${firstBadLabel}.`;
         }
-        const firstInvalid = form.querySelector('.has-error input');
-        if (firstInvalid) firstInvalid.focus();
+        form.querySelector('.has-error input')?.focus();
         return;
     } else {
         if (formError) formError.textContent = ''; // Clear banner on success
     }
 
     const payload = {
-        firstName: inputs.firstName.value.trim(),
-        lastName: inputs.lastName.value.trim(),
-        email: inputs.email.value.trim(),
+        first_name: inputs.firstName.value.trim(),
+        last_name: inputs.lastName.value.trim(),
+        email: inputs.email.value.trim().toLowerCase(),
+        password: inputs.password.value,
     };
-    console.log('Signup payload (demo):', payload);
-    alert('Account created! (frontend demo)');
+    
+    setLoading(true);
+    try {
+        // POST to FastAPI
+        await apiFetch("/api/users/signup", { method: "POST", body: payload });
+
+        // Success UX: route to login 
+        window.location.href = "./login.html?signup=success";
+    } catch (err) {
+        // Backend may send {"detail": "..."} or 400 for duplicate email
+        if (err.status === 400 && err.data?.detail?.toLowerCase().includes("email")) {
+            setError(inputs.email, "An account with this email already exists.");
+            inputs.email.focus();
+        } else {
+            formError.textContent = err.message || "Signup failed. Please try again."
+        }
+    } finally {
+        setLoading(false);
+    }
 
 });
 
