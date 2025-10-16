@@ -1,9 +1,19 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 
 from .database import engine
 from . import models
 from .routers import users
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("Initializing database tables...")
+    models.Base.metadata.createall(bind=engine)
+    
+    yield
+
+    print("Shutting down application...")
 
 app = FastAPI(title="Signup/Login Backend")
 

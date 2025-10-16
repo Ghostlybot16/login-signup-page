@@ -1,6 +1,5 @@
-from ast import Str
-from sqlalchemy import Column, Integer, String, DateTime, func, null
-from .database import Base, engine
+from sqlalchemy import Column, Integer, String, DateTime, func
+from .database import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -11,7 +10,3 @@ class User(Base):
     email = Column(String(120), unique=True, nullable=False, index=True)
     hashed_password = Column(String(256), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
-    
-
-# Auto create tables on startup
-Base.metadata.create_all(bind=engine)
