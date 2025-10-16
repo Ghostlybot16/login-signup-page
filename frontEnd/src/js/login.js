@@ -18,6 +18,14 @@ const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 };
 
+(function showSignupSuccess(){
+    const params = new URLSearchParams(location.search);
+    if (params.get('signup') === 'success') {
+        const el = document.getElementById('loginStatus');
+        if (el) el.textContent = 'Account created! You can log in now.'
+    }
+})();
+
 function setError(inputEl, message='') {
     const group = inputEl.closest('.form-group');
     const errId = inputEl.getAttribute('aria-describedby');
@@ -91,7 +99,7 @@ toggleBtn.addEventListener('click', () => {
             inputs.email.value = remembered;
             rememberBox.checked = true;
         }
-    } catch (e) {}
+    } catch {}
 })();
 
 // Loading helper
@@ -118,14 +126,32 @@ form.addEventListener('submit', async (e) => {
         } else {
             localStorage.removeItem('auth:rememberEmail');
         }
-    } catch (e) {}
+    } catch {}
 
     formError.textContent = '';
     setLoading(true);
-    try {
-        await new Promise(r => setTimeout(r, 1000));
-        console.log('Login payload (demo):', { email: inputs.email.value.trim() });
-        alert('Logged in! (frontend demo)');
+
+    const payload = {
+        email: inputs.email.value.trim().toLowerCase(),
+        password: inputs.password.value,
+    };
+
+    try{
+        const data = await apiFetch("/api/users/login", { method: "POST", body: payload });
+
+        // Save JWT for later API calls 
+        sessionStorage.setItem("token", data.access_token);
+        // Redirect to dashboard
+        window.location.href = "./dashboard.html";
+    }  catch (err) {
+        if (err.status === 401) {
+            setError(inputs.email, 'Invalid email or password.');
+            setError(inputs.password, 'Invalid email or password.');
+            formError.textContent = 'Invalid credentials. Please try again.';
+            inputs.password.focus();
+        } else {
+            formError.textContent = err.message || 'Login failed. Please try again.';
+        }
     } finally {
         setLoading(false);
     }
