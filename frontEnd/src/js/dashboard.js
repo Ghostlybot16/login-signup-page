@@ -2,7 +2,7 @@
 (function guardAuth() {
     const token = sessionStorage.getItem("token");
     if (!token) {
-        window.location.replace("./index.html");
+        window.location.replace("./login.html");
     }
 })();
 
@@ -23,5 +23,5 @@
 
 document.getElementById("logoutBtn")?.addEventListener("click", () => {
     sessionStorage.removeItem("token");
-    window.location.replace("./index.html")
+    window.location.replace("./login.html")
 })

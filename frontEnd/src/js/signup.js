@@ -140,7 +140,7 @@ form.addEventListener('submit', async (e) => {
         await apiFetch("/api/users/signup", { method: "POST", body: payload });
 
         // Success UX: route to login 
-        window.location.href = "./index.html?signup=success";
+        window.location.href = "./login.html?signup=success";
     } catch (err) {
         // Backend may send {"detail": "..."} or 400 for duplicate email
         if (err.status === 400 && err.data?.detail?.toLowerCase().includes("email")) {
