@@ -1,5 +1,5 @@
 // api.js
-const API_BASE = "http://localhost:8000"; // adjust if needed
+const API_BASE = "https://login-signup-page-bwt0.onrender.com/"; // adjust if needed
 
 async function apiFetch(path, { method = "GET", body, token } = {}) {
   const headers = { "Content-Type": "application/json" };
