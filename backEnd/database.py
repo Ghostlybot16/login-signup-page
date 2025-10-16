@@ -7,14 +7,22 @@ from dotenv import load_dotenv
 # Load .env file
 load_dotenv()
 
-# Read the database URL from .env
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./users.db")
+# Base directory to ensure DB outputs stay inside /backEnd 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-connect_args = {"check_same_thread": False} if SQLALCHEMY_DATABASE_URL.startswith("sqlite") else {}
+# Read the database URL from .env
+db_url = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite:///./users.db")
+
+if db_url.startswith("sqlite:///") and not db_url.startswith("sqlite.////"):
+    rel_path = db_url.replace("sqlite:///", "", 1)
+    abs_path = os.path.join(BASE_DIR, rel_path)
+    db_url = f"sqlite:///{abs_path}"
+
+connect_args = {"check_same_thread": False} if db_url.startswith("sqlite") else {}
 
 # Engine + Session setup
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args=connect_args
+    db_url, connect_args=connect_args
 )
 
 SessionLocal = sessionmaker(
