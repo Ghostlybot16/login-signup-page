@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .database import engine
 from . import models
+from .routers import users
 
 app = FastAPI(title="Signup/Login Backend")
 
@@ -19,5 +20,7 @@ app.add_middleware(
 @app.get("/")
 def root():
     return {"message": "Backend is running successfully!"} 
+
+app.include_router(users.router)
 
 print("Database engine connected:", engine)

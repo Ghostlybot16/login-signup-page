@@ -3,6 +3,7 @@ backEnd/venv
 
 #Ignore pycache files 
 backEnd/__pycache__/
+backEnd/routers/__pycache__/
 
 # Ignore DB creation files 
 backEnd/users.db
