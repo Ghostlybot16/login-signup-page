@@ -10,3 +10,5 @@ backEnd/users.db
 
 # Ignore .env file 
 backEnd/.env
+*.env
+!.env.example
