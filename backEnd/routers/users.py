@@ -9,12 +9,15 @@ from auth import (
     verify_password, 
     create_access_token, 
     token_expiry,
+    get_current_user
 )
 
 router = APIRouter(
     prefix="/api/users", 
     tags=["Users"],
 )
+
+
 
 # Helpers 
 def get_user_by_email(
@@ -26,6 +29,8 @@ def get_user_by_email(
         .filter(models.User.email == email)
         .first()
     )
+
+
 
 # Routes 
 @router.post(
@@ -92,18 +97,18 @@ def login(
         or not verify_password(
             payload.password, 
             user.hashed_password
-            )
-        ):
+        )
+    ):
         
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail=(
-                    "Invalid credentials. "
-                    "Check email or password."
-                ),
-            )
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=(
+                "Invalid credentials. "
+                "Check email or password."
+            ),
+        )
     
-    # Create JWT to use to login
+    # Create JWT for authenticated requests
     access_token = create_access_token(
         subject=str(user.id),
         expires_delta=token_expiry(),
@@ -116,3 +121,15 @@ def login(
         "access_token": access_token,
         "token_type": "bearer"
     }
+    
+    
+@router.get(
+    "/me",
+    response_model=schemas.UserResponse,
+)
+def get_me(
+    current_user: models.User = Depends(
+        get_current_user
+    ),
+):
+    return current_user

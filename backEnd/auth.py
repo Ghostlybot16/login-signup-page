@@ -7,6 +7,14 @@ from jose import jwt, JWTError
 from pwdlib import PasswordHash
 from dotenv import load_dotenv
 
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from sqlalchemy.orm import Session
+
+from database import get_db
+import models
+
+# Environment configuration
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(BASE_DIR / ".env")
 
@@ -18,28 +26,42 @@ if not SECRET_KEY:
         "AUTH_SECRET_KEY environment variable is required."
     )
 
-ALGORITHM = os.getenv("AUTH_ALGORITHM", "HS256")
-
-ACCESS_TOKEN_EXPIRE_MINUTES = int(
-    os.getenv("AUTH_ACCESS_MIN", "30")
+ALGORITHM = os.getenv(
+    "AUTH_ALGORITHM", 
+    "HS256"
 )
 
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv(
+        "AUTH_ACCESS_MIN", 
+        "30",
+    )
+)
+
+
+# Password hashing
 _password_hash = PasswordHash.recommended()
 
+
 # Password helpers 
-def hash_password(plain_password: str) -> str:
+def hash_password(
+    plain_password: str
+) -> str:
     """Return a secure hash for a plain-text password"""
-    return _password_hash.hash(plain_password)
+    return _password_hash.hash(
+        plain_password
+    )
 
 def verify_password(
     plain_password: str, 
     hashed_password: str
 ) -> bool:
-    """Verify a plain-text password against a bcrypt hash."""
+    """Verify a plain-text password against a stored hash."""
     return _password_hash.verify(
         plain_password, 
         hashed_password
     )
+
 
 # JWT Helpers 
 def create_access_token(
@@ -49,17 +71,26 @@ def create_access_token(
 ) -> str:
     """
     Create a signed JWT. 
-    `subject` is a stable identifier (e.g., user email or id).
-    `extra_claims` lets you add custom fields (e.g., roles).
+    
+    
+    `subject` should contain a stable identifier
+    such as a user ID.
+    
+    
+    `extra_claims` can contain additional JWT data.
     """
     to_encode: Dict[str, Any] = {
         "sub": subject
     }
     
     if extra_claims:
-        to_encode.update(extra_claims)
+        to_encode.update(
+            extra_claims
+        )
     
-    expire = datetime.now(timezone.utc) + (
+    expire = datetime.now(
+        timezone.utc
+    ) + (
         expires_delta 
         or timedelta(
             minutes=ACCESS_TOKEN_EXPIRE_MINUTES
@@ -74,11 +105,13 @@ def create_access_token(
         algorithm=ALGORITHM,
     )
 
+
 def decode_access_token(
     token: str
 ) -> Dict[str, Any]:
     """
     Decode and validate a JWT.
+    
     Raises JWTError if the token is invalid or expired.
     """
     return jwt.decode(
@@ -87,34 +120,110 @@ def decode_access_token(
         algorithms=[ALGORITHM],
     )
 
+
 def token_expiry(
     minutes: int = ACCESS_TOKEN_EXPIRE_MINUTES,
 ) -> timedelta:
-    """Helper to build a timedelta for custom expirations"""
-    return timedelta(minutes=minutes)
+    """Helper to build a timedelta for token expirations"""
+    return timedelta(
+        minutes=minutes
+    )
 
 
+# Bearer authentication
+bearer_scheme = HTTPBearer(
+    auto_error=False
+)
+
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(
+        bearer_scheme
+    ),
+    db: Session = Depends(get_db),
+) -> models.User:
+    """
+    Validate the request's bearer token and return 
+    the authenticated user.
+    """
+    
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials.",
+        headers={
+            "WWW-Authenticate": "Bearer"
+        },
+    )
+    
+    # No Authorization header was provided
+    if credentials is None:
+        raise credentials_exception
+
+    try:
+        # Extract and decode the JWT
+        payload = decode_access_token(
+            credentials.credentials
+        )
+        
+        # Our login token stores the user's ID
+        # inside the JWT "sub" claim.
+        subject = payload.get("sub")
+        
+        if subject is None:
+            raise credentials_exception
+    
+        user_id = int(subject)
+    
+    except (JWTError, ValueError):
+        raise credentials_exception
+    
+    # Look up the user represented by the token 
+    user = db.get(
+        models.User,
+        user_id,
+    )
+    
+    if user is None:
+        raise credentials_exception
+
+    return user
+    
 # ---- Optional: quick self-test when run directly ----
 if __name__ == "__main__":
     print("Running auth.py self-test…")
     
     pw = "ExamplePass123!"
-    hashed = hash_password(pw)
     
-    print(" Hashed:", hashed[:32] + "…")
+    hashed = hash_password(
+        pw
+    )
+    
+    print(
+        "Hashed:", 
+        hashed[:32] + "…"
+    )
     
     print(
         " Verify (correct):", 
-        verify_password(pw, hashed),
+        verify_password(
+            pw, 
+            hashed
+        ),
     )
+    
     print(
         " Verify (wrong):", 
-        verify_password("nope", hashed),
+        verify_password(
+            "nope", 
+            hashed,
+        ),
     )
 
     tok = create_access_token(
-        subject="user@example.com", 
-        extra_claims={"role": "user"},
+        subject="1", 
+        extra_claims={
+            "role": "user"
+        },
     )
     
     print(
@@ -123,18 +232,32 @@ if __name__ == "__main__":
     )
     
     try:
-        claims = decode_access_token(tok)
+        claims = decode_access_token(
+            tok
+        )
+        
         print(
             " Claims:", 
             {
-                k: claims[k] 
-                for k in ("sub", "role") 
-                if k in claims
+                key: claims[key] 
+                for key in (
+                    "sub", 
+                    "role",
+                ) 
+                if key in claims
             },
         )
-        print("Exp:", claims.get("exp"))
-        print("✅ Self-test OK")
+        print(
+            "Exp:", 
+            claims.get("exp"),
+        )
+        
+        print(
+            "✅ Self-test OK"
+        )
         
     except JWTError as exc:
-        print("❌ JWT error:", exc)
-
+        print(
+            "❌ JWT error:", 
+            exc,
+        )
