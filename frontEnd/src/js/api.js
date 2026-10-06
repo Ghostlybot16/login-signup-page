@@ -1,26 +1,60 @@
-// api.js
-const API_BASE = "https://login-signup-page-bwt0.onrender.com/"; // adjust if needed
+const API_BASE = window.ENV?.API_BASE;
 
-async function apiFetch(path, { method = "GET", body, token } = {}) {
-  const headers = { "Content-Type": "application/json" };
-  if (token) headers.Authorization = `Bearer ${token}`;
+if (!API_BASE) {
+    throw new Error(
+        "API_BASE is not configured. Check config.js."
+    );
+}
 
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers,
-    body: body ? JSON.stringify(body) : undefined,
-    credentials: "omit",
-  });
 
-  let data = null;
-  try { data = await res.json(); } catch { /* ignore */ }
+async function apiFetch(
+    path,
+    {
+        method = "GET",
+        body,
+        token,
+    } = {}
+) {
+    const headers = {
+        "Content-Type": "application/json",
+    };
 
-  if (!res.ok) {
-    const msg = data?.detail || `Request failed (${res.status})`;
-    const err = new Error(msg);
-    err.status = res.status;
-    err.data = data;
-    throw err;
-  }
-  return data;
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const response = await fetch(
+        `${API_BASE}${path}`,
+        {
+            method,
+            headers,
+            body: body
+                ? JSON.stringify(body)
+                : undefined,
+            credentials: "omit",
+        }
+    );
+
+    let data = null;
+
+    try {
+        data = await response.json();
+    } catch {
+        // Response did not contain JSON.
+    }
+
+    if (!response.ok) {
+        const message =
+            data?.detail
+            || `Request failed (${response.status})`;
+
+        const error = new Error(message);
+
+        error.status = response.status;
+        error.data = data;
+
+        throw error;
+    }
+
+    return data;
 }

@@ -18,13 +18,18 @@ const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 };
 
-(function showSignupSuccess(){
-    const params = new URLSearchParams(location.search);
-    if (params.get('signup') === 'success') {
-        const el = document.getElementById('loginStatus');
-        if (el) el.textContent = 'Account created! You can log in now.'
+function showSignupSuccess() {
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    if (params.get("signup") !== 'success') {
+        return;
     }
-})();
+
+    statusEl.textContent =
+        "Account created successfully! You can log in now.";
+}
 
 function setError(inputEl, message='') {
     const group = inputEl.closest('.form-group');
@@ -165,5 +170,12 @@ function clearSensitive() {
     toggleBtn.setAttribute('aria-pressed', 'false');
     toggleBtn.setAttribute('aria-label', 'Show password');
 }
-document.addEventListener('DOMContentLoaded', clearSensitive);
+document.addEventListener(
+    'DOMContentLoaded', 
+    () => {
+        clearSensitive();
+        showSignupSuccess();
+    }
+);
+
 window.addEventListener('pageshow', (e) => { if (e.persisted) clearSensitive(); });

@@ -1,3 +1,3 @@
 window.ENV = {
-    API_BASE: "https://login-signup-page-bwt0.onrender.com/"
+    API_BASE: "http://127.0.0.1:8000"
 };
