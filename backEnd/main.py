@@ -1,6 +1,7 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from contextlib import asynccontextmanager
 
 from database import engine
 import models
@@ -9,19 +10,22 @@ from routers import users
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Initializing database tables...")
-    models.Base.metadata.createall(bind=engine)
+    models.Base.metadata.create_all(bind=engine)
     
     yield
 
     print("Shutting down application...")
 
-app = FastAPI(title="Signup/Login Backend")
+app = FastAPI(
+    title="Signup/Login Backend",
+    lifespan=lifespan
+)
 
 # Allow front end requests 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

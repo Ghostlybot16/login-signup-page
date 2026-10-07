@@ -1,27 +1,79 @@
-// Simple guard: redirect to login if no token
-(function guardAuth() {
-    const token = sessionStorage.getItem("token");
-    if (!token) {
-        window.location.replace("./login.html");
-    }
-})();
+const dashboardShell = document.querySelector(".dash-shell");
+const greetingEl = document.getElementById("greeting");
+const logoutBtn = document.getElementById("logoutBtn");
 
-// Greeting: use remembered email if available 
-(function setGreeting(){
-  const el = document.getElementById("greeting");
-  if (!el) return;
+function redirectToLogin() {
+  window.location.replace("./login.html");
+}
+
+async function loadDasboard() {
+  const token = sessionStorage.getItem("token");
+
+  // No token means the user is not logged in.
+  if (!token) {
+    redirectToLogin();
+    return;
+  }
 
   try {
-    const remembered = localStorage.getItem("auth:rememberEmail");
-    if (remembered) {
-      el.textContent = `Hello there, ${remembered}`;
-      return;
-    }
-  } catch {}
-  el.textContent = "Hello there";
-})();
+    // Verify the token with the backend 
+    // and retrieve the authenticated user.
+    const user = await apiFetch(
+      "/api/users/me",
+      {
+        token,
+      }
+    );
 
-document.getElementById("logoutBtn")?.addEventListener("click", () => {
+    // Use authenticated user data instead of 
+    // the remembered email from localStorage
+    if (greetingEl) {
+      greetingEl.textContent =
+        `Hello, ${user.first_name}`;
+    }
+
+    // Only reveal the dashboard after 
+    // authentication succeeds.
+    if (dashboardShell) {
+      dashboardShell.hidden = false;
+    }
+
+  } catch (err) {
+    if (err.status === 401) {
+      // Token is invalid, expired or belongs 
+      // to a user that no longer exists.
+      sessionStorage.removeItem("token");
+
+      redirectToLogin();
+      return;
+
+    }
+
+
+    // Don't treat server/network failures as 
+    // invalid authentication
+    console.error(
+      "Unable to load dashboard:",
+      err
+    );
+
+    if (greetingEl) {
+      greetingEl.textContent =
+        "Unable to load your account.";
+    }
+
+    if (dashboardShell) {
+      dashboardShell.hidden = false;
+    }
+  }
+}
+
+logoutBtn?.addEventListener(
+  "click",
+  () => {
     sessionStorage.removeItem("token");
-    window.location.replace("./login.html")
-})
+    redirectToLogin();
+  }
+);
+
+loadDasboard();
