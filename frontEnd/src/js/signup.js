@@ -1,37 +1,56 @@
 // Helpers 
 const $ = (sel, root = document) => root.querySelector(sel);
-const form = $('#signupForm');
+
+const form = $("#signupForm");
 
 const inputs = {
-    firstName: $('#firstName'),
-    lastName: $('#lastName'),
-    email: $('#email'),
-    password: $('#password'),
-    terms: $('#terms'),
+    firstName: $("#firstName"),
+    lastName: $("#lastName"),
+    email: $("#email"),
+    password: $("#password"),
+    terms: $("#terms"),
 };
 
-const btnSubmit = $('.btn-primary');
-const toggleBtn = $('.toggle-pass');
-const formError = document.getElementById('formError');
+const btnSubmit = $(".btn-primary");
+const toggleBtn = $(".toggle-pass");
+const formError = $("#formError");
 
 const patterns = {
     email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i
 }
 
-function setError(inputEl, message = '') {
-    const group = inputEl.closest('.form-group');
-    const errId = inputEl.getAttribute('aria-describedby');
-    if (!group || !errId) return;
+function setError(inputEl, message = "") {
+    const group = inputEl.closest(".form-group");
+    const errId = inputEl.getAttribute(
+        "aria-describedby"
+    );
+
+    if (!group || !errId) {
+        return;
+    }
 
     const errEl = document.getElementById(errId);
+
     if (message) {
-        group.classList.add('has-error');
-        inputEl.setAttribute('aria-invalid', 'true');
-        if (errEl) errEl.textContent = message;
-    } else {
-        group.classList.remove('has-error');
-        inputEl.removeAttribute('aria-invalid');
-        if (errEl) errEl.textContent = '';
+        group.classList.add("has-error");
+
+        inputEl.setAttribute(
+            "aria-invalid", 
+            "true"
+        );
+
+        if (errEl) {
+            errEl.textContent = message;
+        } 
+
+        return;
+    } 
+
+    group.classList.remove("has-error");
+    inputEl.removeAttribute("aria-invalid");
+    
+    if (errEl) {
+        errEl.textContent = "";
     }
 }
 
@@ -39,20 +58,55 @@ function validateField(inputEl) {
     const id = inputEl.id;
     const val = inputEl.value.trim();
 
-    if (id === 'firstName' || id === 'lastName'){
-        if (!val) return setError(inputEl, 'This field is required.');
+    if (id === "firstName" || id === "lastName") {
+        if (!val) {
+            return setError(
+                inputEl, 
+                "This field is required."
+            );
+        } 
+        if (val.length > 100) {
+            return setError(
+                inputEl,
+                "Use 100 characters or fewer."
+            );
+        }
         return setError(inputEl);
     }
 
-    if (id === 'email') {
-        if (!val) return setError(inputEl, 'Email is required.');
-        if (!patterns.email.test(val)) return setError(inputEl, 'Enter a valid email address.');
+    if (id === "email") {
+        if (!val) {
+            return setError(
+                inputEl, 
+                "Email is required."
+            );
+        }
+
+        if (!patterns.email.test(val)) {
+            return setError(
+                inputEl, 
+                "Enter a valid email address."
+            );
+        } 
+
         return setError(inputEl);
     }
 
-    if (id === 'password') {
-        if (!val) return setError(inputEl, 'Password is required.');
-        if (val.length < 8) return setError(inputEl, 'Use at least 8 characters.');
+    if (id === "password") {
+        if (!val) {
+            return setError(
+                inputEl, 
+                "Password is required."
+            );
+        }
+
+        if (val.length < 8) {
+            return setError(
+                inputEl, 
+                "Use at least 8 characters."
+            );
+        }
+
         return setError(inputEl);
     }
 }
@@ -63,117 +117,262 @@ function validateForm() {
     validateField(inputs.email);
     validateField(inputs.password);
 
-    const firstInvalid = form.querySelector('.has-error input');
+    const firstInvalid = form.querySelector(
+        ".has-error input"
+    );
+
     return !firstInvalid;
 }
 
 // Inline validation 
-['blur', 'input'].forEach(evt => {
-    inputs.firstName.addEventListener(evt, e => validateField(e.target));
-    inputs.lastName.addEventListener(evt, e => validateField(e.target));
-    inputs.email.addEventListener(evt, e => validateField(e.target));
-    inputs.password.addEventListener(evt, e => validateField(e.target));
+["blur", "input"].forEach(eventName => {
+    inputs.firstName.addEventListener(
+        eventName, 
+        (event) => validateField(event.target)
+    );
+
+    inputs.lastName.addEventListener(
+        eventName, 
+        (event) => validateField(event.target)
+    );
+
+    inputs.email.addEventListener(
+        eventName, 
+        (event) => validateField(event.target)
+    );
+
+    inputs.password.addEventListener(
+        eventName, 
+        (event) => validateField(event.target)
+    );
 });
 
 
 // Disable submit until terms checked 
 function updateSubmitState() {
-    const enabled = inputs.terms.checked;
-    btnSubmit.disabled = !enabled;
+    btnSubmit.disabled =
+        !inputs.terms.checked;
 }
-inputs.terms.addEventListener('change', updateSubmitState);
+
+inputs.terms.addEventListener(
+    "change", 
+    updateSubmitState
+);
+
 updateSubmitState();
 
 // Password show/hide
-toggleBtn.addEventListener('click', () => {
-    if (!inputs.password) return;
+toggleBtn.addEventListener(
+    "click", 
+    () => {
+        const isText = 
+            inputs.password.type === "text";
+    
+    
+        const nowOn = !isText; // "on" means password is visible
 
-    const isText = inputs.password.type === 'text';
-    const nowOn = !isText; // "on" means password is visible
+        inputs.password.type = 
+            nowOn ? "text" : "password";
 
-    inputs.password.type = nowOn ? 'text' : 'password';
-    toggleBtn.classList.toggle('is-on', nowOn);
-    toggleBtn.setAttribute('aria-pressed', String(nowOn));
-    toggleBtn.setAttribute('aria-label', nowOn ? 'Hide password' : 'Show password');
-});
+        toggleBtn.classList.toggle(
+            "is-on", 
+            nowOn
+        );
+
+        toggleBtn.setAttribute(
+            "aria-pressed", 
+            String(nowOn)
+        );
+
+        toggleBtn.setAttribute(
+            "aria-label", 
+            nowOn 
+                ? "Hide password" 
+                : "Show password"
+        );
+    }
+);
 
 // Ensure ARIA matches the current input type 
 (function initPasswordToggleState() {
-    if (!inputs.password || !toggleBtn) return;
-    const visible = inputs.password.type === 'text';
-    toggleBtn.classList.toggle('is-on', visible);
-    toggleBtn.setAttribute('aria-pressed', String(visible));
-    toggleBtn.setAttribute('aria-label', visible ? 'Hide password' : 'Show password');
+    const visible = 
+        inputs.password.type === "text";
+
+    toggleBtn.classList.toggle(
+        "is-on", 
+        visible
+    );
+
+    toggleBtn.setAttribute(
+        "aria-pressed", 
+        String(visible)
+    );
+
+    toggleBtn.setAttribute(
+        "aria-label", 
+        visible 
+            ? "Hide password" 
+            : "Show password"
+    );
 })();
 
+// Loading helper
 function setLoading(on) {
-    btnSubmit.disabled = on || !inputs.terms.checked;
-    btnSubmit.classList.toggle('is-loading', on);
+    btnSubmit.disabled = 
+        on || !inputs.terms.checked;
+
+    btnSubmit.classList.toggle(
+        "is-loading", 
+        on
+    );
 }
 
 // Submit handler
-form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const ok = validateForm();
+form.addEventListener(
+    "submit", 
+    async (event) => {
+        event.preventDefault();
+        
+        const isValid = validateForm();
 
-    if (!ok) {
-        if (formError) {
-            const firstBadLabel = form.querySelector('.has-error label')?.textContent?.trim() || 'form';
-            formError.textContent = `Please correct the highlighted fields. First issue: ${firstBadLabel}.`;
+        if (!isValid) {
+            const firstBadLabel = 
+                form
+                    .querySelector(
+                        ".has-error label"
+                    )
+                    ?.textContent
+                    ?.trim() 
+                || "form";
+
+            formError.textContent = 
+                `Please correct the highlighted fields. ` 
+                + `First issue: ${firstBadLabel}.`;
+            
+            form
+                .querySelector(
+                    ".has-error input"
+                )
+                ?.focus();
+            return;
+        } 
+
+        if (!inputs.terms.checked) {
+            formError.textContent =
+                "You must agree to the Terms & Conditions.";
+            
+            inputs.terms.focus();
+            return;
         }
-        form.querySelector('.has-error input')?.focus();
-        return;
-    } else {
-        if (formError) formError.textContent = ''; // Clear banner on success
-    }
+        
+        formError.textContent = ""; // Clear banner on success
 
-    const payload = {
-        first_name: inputs.firstName.value.trim(),
-        last_name: inputs.lastName.value.trim(),
-        email: inputs.email.value.trim().toLowerCase(),
-        password: inputs.password.value,
+        const payload = {
+            first_name: 
+                inputs.firstName.value.trim(),
+            
+            last_name: 
+                inputs.lastName.value.trim(),
+        
+            email: 
+                inputs.email
+                    .value
+                    .trim()
+                    .toLowerCase(),
+        
+            password: 
+                inputs.password.value,
     };
     
     setLoading(true);
+
     try {
         // POST to FastAPI
-        await apiFetch("/api/users/signup", { method: "POST", body: payload });
+        await apiFetch(
+            "/api/users/signup", 
+            { 
+                method: "POST", 
+                body: payload 
+            }
+        );
 
-        // Success UX: route to login 
-        window.location.href = "./login.html?signup=success";
+        // Redirect to login after successful signup 
+        window.location.href = 
+            "./login.html?signup=success";
+    
     } catch (err) {
-        // Backend may send {"detail": "..."} or 400 for duplicate email
-        if (err.status === 400 && err.data?.detail?.toLowerCase().includes("email")) {
-            setError(inputs.email, "An account with this email already exists.");
-            inputs.email.focus();
-        } else {
-            formError.textContent = err.message || "Signup failed. Please try again."
-        }
-    } finally {
-        setLoading(false);
-    }
+            const detail = err.data?.detail;
 
-});
+            if (
+                err.status === 400 
+                && typeof detail === "string"
+                && detail
+                    .toLowerCase()
+                    .includes("email")
+            ) {
+                setError(
+                    inputs.email, 
+                    "An account with this email already exists."
+                );
+                    
+                formError.textContent =
+                    "An account with this email already exists.";
+
+                inputs.email.focus();
+            
+            } else if (err.status === 422) {
+                formError.textContent =
+                    err.message
+                    || "Please check the information you entered.";
+                
+            } else if (err.status === 0) {
+                formError.textContent =
+                    err.message
+                    || "Unable to connect to the server. Please try again.";
+            } else {
+                formError.textContent = 
+                    err.message 
+                    || "Signup failed. Please try again."
+            }
+        
+        } finally {
+            setLoading(false);
+        }
+    }
+);
 
 // Clear sensitive fields on load or when page is restored from bfcache (back/forward)
 function clearSensitive(){
-    if (inputs.password) {
-        inputs.password.value = '';
-        
-        // Make sure it's back to password mode and the toggle is reset
-        inputs.password.type = 'password';
-        if (toggleBtn) {
-            toggleBtn.classList.remove('is-on');
-            toggleBtn.setAttribute('aria-pressed', 'false');
-            toggleBtn.setAttribute('aria-label', 'Show password');
-        }
-    }
-    if (inputs.terms) inputs.terms.checked = false;
+    inputs.password.value = "";
+    inputs.password.type = "password";
     
+    toggleBtn.classList.remove("is-on");
+    
+    toggleBtn.setAttribute(
+        "aria-pressed", 
+        "false"
+    );
+    
+    toggleBtn.setAttribute(
+        "aria-label", 
+        "Show password"
+    );
+    
+    inputs.terms.checked = false;
+
     updateSubmitState();
 }
 
-document.addEventListener('DOMContentLoaded', clearSensitive);
-window.addEventListener('pageshow', (e) => {
-    if (e.persisted) clearSensitive();
-});
+document.addEventListener(
+    "DOMContentLoaded", 
+    clearSensitive
+);
+
+window.addEventListener(
+    "pageshow", 
+    (event) => {
+        if (event.persisted) {
+            clearSensitive();
+        }
+    }
+);
