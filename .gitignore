@@ -1,5 +1,6 @@
 # Ignore python venv directory
 backEnd/venv
+venv
 
 #Ignore pycache files 
 backEnd/__pycache__/
