@@ -1,0 +1,120 @@
+.pageLink {
+    color: #111111;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pageLink:hover {
+    text-decoration: underline;
+}
+
+.submitButton {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+
+    --button-bg: #000000;
+    --button-hover: #000000;
+
+    background-color: #2f2f2f;
+    color: #ffffff;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.submitButton::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+
+    background-color: #000000;
+    border-radius: inherit;
+
+    transform: scaleX(0);
+    transform-origin: center center;
+
+    transition: transform 0.45s ease-in-out;
+    pointer-events: none;
+}
+
+.submitButton:not(:disabled):hover::before {
+    transform: scaleX(1);
+}
+
+.submitButton :global(.mantine-Button-inner) {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .submitButton::before {
+        transition: none;
+    }
+}
+
+.googleButton {
+    border-radius: 999px;
+    border: 1px solid #d9d9d9;
+    background-color: #ffffff;
+    color: #111111;
+}
+
+.googleButton:hover {
+    background-color: #f8f8f8;
+}
+
+.fieldLabel {
+    color: #111111;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.lineInput {
+    border: none !important;
+    border-bottom: 1px solid #d9d9d9 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 12px 0 !important;
+}
+
+.lineInput:focus,
+.lineInput:focus-visible {
+    border-bottom: 1px solid #111111 !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.lineInput::placeholder {
+    color: #a3a3a3;
+}
+
+.fieldDescription {
+    margin-top: 6px;
+    color: #7a7a7a;
+    font-size: 0.86rem;
+}
+
+.fieldError {
+    margin-top: 6px;
+    font-size: 0.86rem;
+}
+
+.sectionText {
+    color: #8b8b8b;
+}
+
+.helperText {
+    color: #7a7a7a;
+    font-size: 0.92rem;
+}
+
+.formDivider {
+    color: #9a9a9a;
+}
+
+.termsText {
+    color: #444444;
+}

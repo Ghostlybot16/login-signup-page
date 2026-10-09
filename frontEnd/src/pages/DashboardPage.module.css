@@ -1,0 +1,24 @@
+
+/* Dashboard background */
+.page {
+    width: 100%;
+    min-height: 100dvh;
+
+    background:
+        radial-gradient(
+            circle at 15% 20%,
+            #faf4ec 0%,
+            transparent 45%
+        ),
+        radial-gradient(
+            circle at 85% 80%,
+            #e3ebf6 0%,
+            transparent 48%
+        ),
+        linear-gradient(
+            135deg,
+            #f7f9fc 0%,
+            #edf1f6 55%,
+            #f5f2f0 100%
+        );
+}
