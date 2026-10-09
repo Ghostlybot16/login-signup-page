@@ -1,67 +1,61 @@
+import { useState } from "react";
+
 import {
-    useState,
-} from "react";
+    Alert,
+    Anchor,
+    Box,
+    Button,
+    Checkbox,
+    Divider,
+    PasswordInput,
+    SimpleGrid,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+} from "@mantine/core";
 
 import {
     Link,
     useNavigate,
 } from "react-router-dom";
 
+import formStyles from "../components/AuthForm.module.css";
+import AuthLayout from "../components/AuthLayout.jsx";
 import { apiFetch } from "../api.js";
 
-import companyLogo from "../../assets/images/company_logo.png";
 import googleLogo from "../../assets/icons/google_logo.svg";
-import facebookLogo from "../../assets/icons/facebook_logo.svg";
 
-import "../css/signup.css";
-
-
-const EMAIL_PATTERN =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 
 
 function SignupPage() {
     const navigate = useNavigate();
 
-    const [firstName, setFirstName] =
-        useState("");
+    const [firstName, setFirstName] = useState("");
 
-    const [lastName, setLastName] =
-        useState("");
+    const [lastName, setLastName] = useState("");
 
-    const [email, setEmail] =
-        useState("");
+    const [email, setEmail] = useState("");
 
-    const [password, setPassword] =
-        useState("");
+    const [password, setPassword] = useState("");
 
-    const [terms, setTerms] =
-        useState(false);
+    const [terms, setTerms] = useState(false);
 
-    const [showPassword, setShowPassword] =
-        useState(false);
+    const [errors, setErrors] = useState({});
 
-    const [errors, setErrors] =
-        useState({});
+    const [formError, setFormError] = useState("");
 
-    const [formError, setFormError] =
-        useState("");
-
-    const [loading, setLoading] =
-        useState(false);
+    const [loading, setLoading] = useState(false);
 
 
-    const validate = () => {
+    function validateForm() {
         const nextErrors = {};
 
         if (!firstName.trim()) {
-            nextErrors.firstName =
-                "This field is required.";
-        } else if (
-            firstName.trim().length > 100
-        ) {
-            nextErrors.firstName =
-                "Use 100 characters or fewer.";
+            nextErrors.firstName = "This field is required.";
+        } else if (firstName.trim().length > 100) {
+            nextErrors.firstName = "Use 100 characters or fewer.";
         }
 
         if (!lastName.trim()) {
@@ -75,44 +69,40 @@ function SignupPage() {
         }
 
         if (!email.trim()) {
-            nextErrors.email =
-                "Email is required.";
+            nextErrors.email = "Email is required.";
         } else if (
             !EMAIL_PATTERN.test(email.trim())
         ) {
-            nextErrors.email =
-                "Enter a valid email address.";
+            nextErrors.email = "Enter a valid email address.";
         }
 
         if (!password) {
-            nextErrors.password =
-                "Password is required.";
+            nextErrors.password = "Password is required.";
         } else if (password.length < 8) {
-            nextErrors.password =
-                "Use at least 8 characters.";
+            nextErrors.password = "Use at least 8 characters.";
+        }
+
+        if (!terms) {
+            nextErrors.terms =
+                "You must agree to the Terms & Conditions.";
         }
 
         setErrors(nextErrors);
 
-        return (
-            Object.keys(nextErrors).length === 0
-        );
+        return Object.keys(nextErrors).length === 0;
     };
 
 
-    const handleSubmit = async (event) => {
+    async function handleSubmit(event) {
         event.preventDefault();
-
-        if (!validate()) {
-            setFormError(
-                "Please correct the highlighted fields."
-            );
+        
+        if (loading) {
             return;
         }
 
-        if (!terms) {
+        if (!validateForm()) {
             setFormError(
-                "You must agree to the Terms & Conditions."
+                "Please correct the highlighted fields."
             );
             return;
         }
@@ -126,16 +116,11 @@ function SignupPage() {
                 {
                     method: "POST",
                     body: {
-                        first_name:
-                            firstName.trim(),
+                        first_name:firstName.trim(),
 
-                        last_name:
-                            lastName.trim(),
+                        last_name:lastName.trim(),
 
-                        email:
-                            email
-                                .trim()
-                                .toLowerCase(),
+                        email:email.trim().toLowerCase(),
 
                         password,
                     },
@@ -182,277 +167,234 @@ function SignupPage() {
 
 
     return (
-        <main
-            id="main"
-            role="main"
-        >
-            <div className="auth-container">
+        <AuthLayout variant="signup">
+            <Stack gap="xl">
 
-                <div className="auth-left">
-                    <img
-                        src={companyLogo}
-                        alt="Company logo"
-                        className="company-logo"
-                    />
-                </div>
+                {/* Page heading */}
+                <Box>
+                    <Title order={1} fw={600}>
+                        Create an Account
+                    </Title>
 
-                <div className="auth-right">
-                    <div className="form-wrapper">
-
-                        <h1>Create an Account</h1>
-
-                        <p className="subtext">
-                            Already have an account?{" "}
-                            <Link to="/login">
-                                Log in
-                            </Link>
-                        </p>
-
-                        <form
-                            className="signup-form"
-                            onSubmit={handleSubmit}
-                            noValidate
+                    <Text c="dimmed" mt="xs" size="sm">
+                        Already have an account?{" "}
+                        <Anchor
+                            component={Link}
+                            to="/login"
+                            className={formStyles.pageLink}
                         >
-                            <div
-                                className="form-error"
+                            Log in
+                        </Anchor>
+                    </Text>
+                </Box>
+
+                {/* Signup form */}
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                >
+                    <Stack gap="lg">
+                        
+                        {/* Form/API errors */}
+                        {formError && (
+                            <Alert
+                                color="red"
+                                title="Unable to create account"
+                                variant="light"
                                 role="alert"
-                                aria-live="polite"
                             >
                                 {formError}
-                            </div>
+                            </Alert>
+                        )}
 
-                            <div className="form-row">
-                                <div
-                                    className={
-                                        `form-group ${
-                                            errors.firstName
-                                                ? "has-error"
-                                                : ""
-                                        }`
-                                    }
-                                >
-                                    <label htmlFor="firstName">
-                                        First Name
-                                    </label>
+                        {/* First and last names */}
+                        <SimpleGrid
+                            cols={{ base: 1, sm: 2}}
+                            spacing="md"
+                        >
+                            <TextInput
+                                label="First Name"
+                                placeholder="John"
+                                name="firstName"
+                                autoComplete="given-name"
+                                size="md"
+                                variant="unstyled"
+                                value={firstName}
+                                onChange={(event) => {
+                                    setFirstName(
+                                        event.currentTarget.value
+                                    );
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        firstName: "",
+                                    }));
+                                    setFormError("");
+                                }}
+                                error={errors.firstName}
+                                required
+                                classNames={{
+                                    label: formStyles.fieldLabel,
+                                    input: formStyles.lineInput,
+                                    error: formStyles.fieldError,
+                                }}
+                            />
 
-                                    <input
-                                        type="text"
-                                        id="firstName"
-                                        value={firstName}
-                                        onChange={(event) =>
-                                            setFirstName(
-                                                event.target.value
-                                            )
-                                        }
-                                        autoComplete="given-name"
-                                        placeholder="John"
-                                    />
+                            <TextInput
+                                label="Last Name"
+                                placeholder="Doe"
+                                name="lastName"
+                                autoComplete="family-name"
+                                size="md"
+                                variant="unstyled"
+                                value={lastName}
+                                onChange={(event) => {
+                                    setLastName(
+                                        event.currentTarget.value
+                                    );
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        lastName: "",
+                                    }));
+                                    setFormError("");
+                                }}
+                                error={errors.lastName}
+                                required
+                                classNames={{
+                                    label: formStyles.fieldLabel,
+                                    input: formStyles.lineInput,
+                                    error: formStyles.fieldError,
+                                }}
+                            />
+                        </SimpleGrid>
 
-                                    <p className="field-error">
-                                        {errors.firstName}
-                                    </p>
-                                </div>
+                        {/* Email */}
+                        <TextInput
+                            label="Email Address"
+                            placeholder="name@example.com"
+                            type="email"
+                            name="email"
+                            autoComplete="email"
+                            size="md"
+                            variant="unstyled"
+                            value={email}
+                            onChange={(event) => {
+                                setEmail(event.currentTarget.value);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    email: "",
+                                }));
+                                setFormError("");
+                            }}
+                            error={errors.email}
+                            required
+                            classNames={{
+                                label: formStyles.fieldLabel,
+                                input: formStyles.lineInput,
+                                error: formStyles.fieldError,
+                            }}
+                        />
 
-                                <div
-                                    className={
-                                        `form-group ${
-                                            errors.lastName
-                                                ? "has-error"
-                                                : ""
-                                        }`
-                                    }
-                                >
-                                    <label htmlFor="lastName">
-                                        Last Name
-                                    </label>
+                        {/* Password */}
+                        <PasswordInput
+                            label="Password"
+                            placeholder="Create a password"
+                            name="password"
+                            autoComplete="new-password"
+                            size="md"
+                            variant="unstyled"
+                            value={password}
+                            onChange={(event) => {
+                                setPassword(event.currentTarget.value);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    password: "",
+                                }));
+                                setFormError("");
+                            }}
+                            error={errors.password}
+                            description="Use at least 8 characters."
+                            required
+                            classNames={{
+                                label: formStyles.fieldLabel,
+                                input: formStyles.lineInput,
+                                innerInput: formStyles.lineInput,
+                                description: formStyles.fieldDescription,
+                                error: formStyles.fieldError,
+                                section: formStyles.sectionText,
+                            }}
+                        />
 
-                                    <input
-                                        type="text"
-                                        id="lastName"
-                                        value={lastName}
-                                        onChange={(event) =>
-                                            setLastName(
-                                                event.target.value
-                                            )
-                                        }
-                                        autoComplete="family-name"
-                                        placeholder="Doe"
-                                    />
+                        {/* Terms acceptance */}
+                        <Checkbox
+                            label="I agree to the Terms & Conditions"
+                            checked={terms}
+                            onChange={(event) => {
+                                setTerms(event.currentTarget.checked);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    terms: "",
+                                }));
+                                setFormError("");
+                            }}
+                            error={errors.terms}
+                            classNames={{
+                                label: formStyles.termsText,
+                                error: formStyles.fieldError,
+                            }}
+                        />
 
-                                    <p className="field-error">
-                                        {errors.lastName}
-                                    </p>
-                                </div>
-                            </div>
 
-                            <div
-                                className={
-                                    `form-group ${
-                                        errors.email
-                                            ? "has-error"
-                                            : ""
-                                    }`
-                                }
-                            >
-                                <label htmlFor="email">
-                                    Email Address
-                                </label>
+                        {/* Create account Button*/}
+                        <Button
+                            type="submit"
+                            fullWidth
+                            size="md"
+                            radius="xl"
+                            loading={loading}
+                            className={formStyles.submitButton}
+                        >
+                            Create Account
+                        </Button>
 
-                                <input
-                                    type="email"
-                                    id="email"
-                                    value={email}
-                                    onChange={(event) =>
-                                        setEmail(
-                                            event.target.value
-                                        )
-                                    }
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
+                        <Divider
+                            label="OR"
+                            labelPosition="center"
+                        />
+
+                        {/* Future Google authentication */}
+                        <Button
+                            type="button"
+                            variant="default"
+                            fullWidth
+                            size="md"
+                            radius="xl"
+                            disabled
+                            className={formStyles.googleButton}
+                            leftSection={
+                                <img
+                                    src={googleLogo}
+                                    alt=""
+                                    width={22}
+                                    height={22}
                                 />
+                            }
+                        >
+                            Continue with Google
+                        </Button>
 
-                                <p className="field-error">
-                                    {errors.email}
-                                </p>
-                            </div>
+                        <Text
+                            ta="center"
+                            size="xs"
+                            c="dimmed"
+                        >
+                            Google sign-in coming soon
+                        </Text>
 
-                            <div
-                                className={
-                                    `form-group ${
-                                        errors.password
-                                            ? "has-error"
-                                            : ""
-                                    }`
-                                }
-                            >
-                                <label htmlFor="password">
-                                    Password
-                                </label>
-
-                                <div className="password-field">
-                                    <input
-                                        type={
-                                            showPassword
-                                                ? "text"
-                                                : "password"
-                                        }
-                                        id="password"
-                                        value={password}
-                                        onChange={(event) =>
-                                            setPassword(
-                                                event.target.value
-                                            )
-                                        }
-                                        autoComplete="new-password"
-                                        placeholder="••••••••"
-                                    />
-
-                                    <button
-                                        type="button"
-                                        className={
-                                            `toggle-pass ${
-                                                showPassword
-                                                    ? "is-on"
-                                                    : ""
-                                            }`
-                                        }
-                                        onClick={() =>
-                                            setShowPassword(
-                                                (value) =>
-                                                    !value
-                                            )
-                                        }
-                                        aria-pressed={
-                                            showPassword
-                                        }
-                                    />
-                                </div>
-
-                                <p className="field-error">
-                                    {errors.password}
-                                </p>
-                            </div>
-
-                            <div className="form-check">
-                                <input
-                                    type="checkbox"
-                                    id="terms"
-                                    checked={terms}
-                                    onChange={(event) =>
-                                        setTerms(
-                                            event.target.checked
-                                        )
-                                    }
-                                />
-
-                                <label htmlFor="terms">
-                                    I agree to the{" "}
-                                    <a href="#">
-                                        Terms & Conditions
-                                    </a>
-                                </label>
-                            </div>
-
-                            <button
-                                type="submit"
-                                className="btn-primary"
-                                disabled={
-                                    loading || !terms
-                                }
-                            >
-                                <strong>
-                                    {loading
-                                        ? "Creating Account..."
-                                        : "Create Account"}
-                                </strong>
-                            </button>
-
-                            <div
-                                className="divider"
-                                aria-hidden="true"
-                            >
-                                <span>OR</span>
-                            </div>
-
-                            <div className="social-buttons-container">
-                                <button
-                                    type="button"
-                                    className="btn-social google"
-                                >
-                                    <img
-                                        src={googleLogo}
-                                        alt=""
-                                        width={30}
-                                        height={30}
-                                        aria-hidden="true"
-                                    />
-                                    <span>
-                                        Continue with Google
-                                    </span>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="btn-social facebook"
-                                >
-                                    <img
-                                        src={facebookLogo}
-                                        alt=""
-                                        width={30}
-                                        height={30}
-                                        aria-hidden="true"
-                                    />
-                                    <span>
-                                        Continue with Facebook
-                                    </span>
-                                </button>
-                            </div>
-                        </form>
-
-                    </div>
-                </div>
-            </div>
-        </main>
+                    </Stack>
+                </Box>
+            </Stack>
+        </AuthLayout>
     );
 }
 

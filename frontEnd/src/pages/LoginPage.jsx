@@ -1,6 +1,19 @@
+import { useState } from "react";
+
 import {
-    useState,
-} from "react";
+    Alert,
+    Anchor,
+    Box,
+    Button,
+    Checkbox,
+    Divider,
+    Group,
+    PasswordInput,
+    Stack,
+    Text,
+    TextInput,
+    Title,
+} from "@mantine/core"
 
 import {
     Link,
@@ -8,18 +21,13 @@ import {
     useSearchParams,
 } from "react-router-dom";
 
+import AuthLayout from "../components/AuthLayout";
+import formStyles from "../components/AuthForm.module.css";
 import { apiFetch } from "../api";
 
-import companyLogo from "../../assets/images/company_logo.png";
 import googleLogo from "../../assets/icons/google_logo.svg";
-import facebookLogo from "../../assets/icons/facebook_logo.svg";
 
-import "../css/signup.css";
-import "../css/login.css";
-
-
-const EMAIL_PATTERN =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 
 function getRememberedEmail() {
     try {
@@ -33,63 +41,72 @@ function getRememberedEmail() {
     }
 }
 
+function validateEmail(value) {
+    const trimmed = value.trim();
+
+    if (!trimmed) {
+        return "Email is required.";
+    }
+
+    if (!EMAIL_PATTERN.test(trimmed)) {
+        return "Enter a valid email address.";
+    }
+
+    return "";
+}
+
+function validatePassword(value) {
+    if (!value) {
+        return "Password is required.";
+    }
+
+    if (value.length < 8) {
+        return "Use at least 8 characters.";
+    }
+
+    return "";
+}
+
+
 function LoginPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-    const [email, setEmail] =
-        useState(() => getRememberedEmail());
+    const [email, setEmail] = useState(
+        () => getRememberedEmail()
+    );
     
-    const [password, setPassword] =
-        useState("");
+    const [password, setPassword] = useState("");
     
-    const [rememberMe, setRememberMe] =
-        useState(() => Boolean(
-            getRememberedEmail()
-        ));
+    const [rememberMe, setRememberMe] = useState(
+        () => Boolean(getRememberedEmail())
+    );
     
-    const [showPassword, setShowPassword] =
-        useState(false);
+    const [errors, setErrors] = useState({});
     
-    const [errors, setErrors] =
-        useState({});
+    const [formError, setFormError] = useState("");
     
-    const [formError, setFormError] =
-        useState("");
-    
-    const [loading, setLoading] =
-        useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const validate = () => {
-        const nextErrors = {};
-
-        const trimmedEmail = email.trim();
-
-        if (!trimmedEmail) {
-            nextErrors.email =
-                "Email is required.";
-        } else if (!EMAIL_PATTERN.test(trimmedEmail)) {
-            nextErrors.email =
-                "Enter a valid email address.";
-        }
-
-        if (!password) {
-            nextErrors.password =
-                "Password is required.";
-        } else if (password.length < 8) {
-            nextErrors.password =
-                "Use at least 8 characters.";
-        }
+    const signupSuccess = 
+        searchParams.get("signup") === "success";
+    
+    function validateForm() {
+        const nextErrors = {
+            email: validateEmail(email),
+            password: validatePassword(password),
+        };
 
         setErrors(nextErrors);
 
-        return (Object.keys(nextErrors).length === 0);
-    };
+        return !nextErrors.email
+            && !nextErrors.password;
+    }
 
-    const handleSubmit = async (event) => {
+    async function handleSubmit(event) {
         event.preventDefault();
 
-        if (!validate()) {
+        if (!validateForm()) {
             setFormError(
                 "Please correct the highlighted fields."
             );
@@ -100,17 +117,6 @@ function LoginPage() {
         setLoading(true);
 
         try {
-            if (rememberMe) {
-                localStorage.setItem(
-                    "auth:rememberEmail",
-                    email.trim()
-                );
-            } else {
-                localStorage.removeItem(
-                    "auth:rememberEmail"
-                );
-            }
-
             const data = await apiFetch(
                 "/api/users/login",
                 {
@@ -121,6 +127,23 @@ function LoginPage() {
                     },
                 }
             );
+            
+            // Remember the email only after 
+            // a successful login.
+            try {
+                if (rememberMe) {
+                    localStorage.setItem(
+                        "auth:rememberEmail",
+                        email.trim()
+                    );
+                } else {
+                    localStorage.removeItem(
+                        "auth:rememberEmail"
+                    );
+                }
+            } catch {
+                // Storage may be unavailable
+            }
 
             sessionStorage.setItem(
                 "token",
@@ -131,6 +154,7 @@ function LoginPage() {
                 "/dashboard",
                 { replace: true }
             );
+
         } catch (error) {
             if (error.status === 401) {
                 setErrors({
@@ -147,6 +171,7 @@ function LoginPage() {
                     || "Login failed. Please try again."
                 );
             }
+        
         } finally {
             setLoading(false);
         }
@@ -154,254 +179,198 @@ function LoginPage() {
 
 
     return (
-        <>
-            <a
-                className="skip-link"
-                href="#main"
-            >
-                Skip to main content
-            </a>
+        <AuthLayout variant="login">
+            <Stack gap="xl">
 
-            <main
-                id="main"
-                role="main"
-            >
-                <div className="auth-container">
+                {/* Page heading */}
+                <Box>
+                    <Title order={1} fw={600}>
+                        Log in
+                    </Title>
 
-                    <div
-                        className="auth-left auth-left--login"
-                        role="img"
-                        aria-label="Dark single tall tree"
+                    <Text c="dimmed" mt="xs" size="sm">
+                        Don't have an account?{" "}
+                        <Anchor
+                            component={Link}
+                            to="/signup"
+                            className={formStyles.pageLink}
+                        >
+                            Create an Account
+                        </Anchor>
+                    </Text>
+                </Box>
+
+                {/* Signup Confirmation */}
+                {signupSuccess && (
+                    <Alert
+                        color="green"
+                        title="Account created"
+                        variant="light"
+                        role="status"
                     >
-                        <img
-                            src={companyLogo}
-                            alt="Company logo"
-                            className="company-logo"
-                        />
-                    </div>
+                        Your account was created successfully.
+                        You can log in now.
+                    </Alert>
+                )}
 
-                    <div className="auth-right">
-                        <div className="form-wrapper">
+                {/* Login form */}
+                <Box
+                    component="form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                >
+                    <Stack gap="xl">
 
-                            <h1>Log in</h1>
-
-                            <p className="subtext">
-                                Don't have an account?{" "}
-                                <Link to="/signup">
-                                    Create an Account
-                                </Link>
-                            </p>
-
-                            <form
-                                className="login-form"
-                                onSubmit={handleSubmit}
-                                noValidate
+                        {/* API/form errors */}
+                        {formError && (
+                            <Alert
+                                color="red"
+                                title="Unable to log in"
+                                variant="light"
+                                role="alert"
                             >
-                                <div
-                                    className="form-error"
-                                    role="alert"
-                                    aria-live="polite"
-                                >
-                                    {formError}
-                                </div>
+                                {formError}
+                            </Alert>
+                        )}
 
-                                <div
-                                    className={
-                                        `form-group ${
-                                            errors.email
-                                                ? "has-error"
-                                                : ""
-                                        }`
-                                    }
-                                >
-                                    <label htmlFor="email">
-                                        Email Address
-                                    </label>
+                        <TextInput
+                            label="Email Address"
+                            placeholder="name@example.com"
+                            type="email"
+                            name="email"
+                            autoComplete="username"
+                            size="md"
+                            variant="unstyled"
+                            value={email}
+                            onChange={(event) => {
+                                setEmail(event.currentTarget.value);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    email: "",
+                                }));
+                                setFormError("");
+                            }}
+                            onBlur={() =>
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    email: validateEmail(email),
+                                }))
+                            }
+                            error={errors.email}
+                            required
+                            classNames={{
+                                label: formStyles.fieldLabel,
+                                input: formStyles.lineInput,
+                                error: formStyles.fieldError
+                            }}
+                        />
 
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        value={email}
-                                        onChange={(event) =>
-                                            setEmail(
-                                                event.target.value
-                                            )
-                                        }
-                                        autoComplete="username"
-                                        inputMode="email"
-                                        placeholder="name@example.com"
-                                        aria-invalid={
-                                            Boolean(
-                                                errors.email
-                                            )
-                                        }
-                                    />
+                        <PasswordInput
+                            label="Password"
+                            placeholder="Enter your password"
+                            name="password"
+                            autoComplete="current-password"
+                            size="md"
+                            variant="unstyled"
+                            value={password}
+                            onChange={(event) => {
+                                setPassword(event.currentTarget.value);
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    password: "",
+                                }));
+                                setFormError("");
+                            }}
+                            onBlur={() =>
+                                setErrors((prev) => ({
+                                    ...prev,
+                                    password: validatePassword(password),
+                                }))
+                            }
+                            error={errors.password}
+                            required
+                            classNames={{
+                                label: formStyles.fieldLabel,
+                                input: formStyles.lineInput,
+                                innerInput: formStyles.lineInput,
+                                error: formStyles.fieldError,
+                                section: formStyles.sectionText,
+                            }}
+                        />
 
-                                    <p className="field-error">
-                                        {errors.email}
-                                    </p>
-                                </div>
+                        <Group
+                            justify="space-between"
+                            align="center"
+                            gap="xs"
+                        >
+                            <Checkbox
+                                label="Remember Me"
+                                checked={rememberMe}
+                                onChange={(event) =>
+                                    setRememberMe(
+                                        event.currentTarget.checked
+                                    )
+                                }
+                            />
 
-                                <div
-                                    className={
-                                        `form-group ${
-                                            errors.password
-                                                ? "has-error"
-                                                : ""
-                                        }`
-                                    }
-                                >
-                                    <label htmlFor="password">
-                                        Password
-                                    </label>
+                            <Text size="sm" className={formStyles.helperText}>
+                                Forgot password? (Coming soon)
+                            </Text>
+                        </Group>
 
-                                    <div className="password-field">
-                                        <input
-                                            type={
-                                                showPassword
-                                                    ? "text"
-                                                    : "password"
-                                            }
-                                            id="password"
-                                            value={password}
-                                            onChange={(event) =>
-                                                setPassword(
-                                                    event.target.value
-                                                )
-                                            }
-                                            autoComplete="current-password"
-                                            placeholder="••••••••"
-                                            aria-invalid={
-                                                Boolean(
-                                                    errors.password
-                                                )
-                                            }
-                                        />
+                        <Button
+                            type="submit"
+                            fullWidth
+                            size="md"
+                            radius="xl"
+                            loading={loading}
+                            className={formStyles.submitButton}
+                        >
+                            Log in
+                        </Button>
 
-                                        <button
-                                            type="button"
-                                            className={
-                                                `toggle-pass ${
-                                                    showPassword
-                                                        ? "is-on"
-                                                        : ""
-                                                }`
-                                            }
-                                            onClick={() =>
-                                                setShowPassword(
-                                                    (value) =>
-                                                        !value
-                                                )
-                                            }
-                                            aria-label={
-                                                showPassword
-                                                    ? "Hide password"
-                                                    : "Show password"
-                                            }
-                                            aria-pressed={
-                                                showPassword
-                                            }
-                                        />
-                                    </div>
+                        <Divider
+                            label="OR"
+                            labelPosition="center"
+                            className={formStyles.formDivider}
+                        />
 
-                                    <p className="field-error">
-                                        {errors.password}
-                                    </p>
+                        {/* Google sign-in */}
+                        <Button
+                            type="button"
+                            variant="default"
+                            fullWidth
+                            size="md"
+                            radius="xl"
+                            disabled
+                            className={formStyles.googleButton}
+                            leftSection={
+                                <img
+                                    src={googleLogo}
+                                    alt=""
+                                    width={22}
+                                    height={22}
+                                />
+                            }
+                        >
+                            Continue with Google
+                        </Button>
 
-                                    <div className="muted-row-between">
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                checked={rememberMe}
-                                                onChange={(event) =>
-                                                    setRememberMe(
-                                                        event.target.checked
-                                                    )
-                                                }
-                                            />
-                                            {" "}Remember Me
-                                        </label>
+                        <Text
+                            ta="center"
+                            size="xs"
+                            c="dimmed"
+                        >
+                            Google sign-in coming soon
+                        </Text>
 
-                                        <a
-                                            className="small-link"
-                                            href="#"
-                                        >
-                                            Forgot Password?
-                                        </a>
-                                    </div>
-                                </div>
+                    </Stack>
+                </Box>
+            </Stack>
 
-                                <button
-                                    type="submit"
-                                    className="btn-primary"
-                                    disabled={loading}
-                                >
-                                    <strong>
-                                        {loading
-                                            ? "Signing In..."
-                                            : "Log In"}
-                                    </strong>
-                                </button>
-
-                                <p
-                                    className="muted-hint"
-                                    aria-live="polite"
-                                >
-                                    {
-                                        searchParams.get(
-                                            "signup"
-                                        ) === "success"
-                                            ? "Account created successfully! You can log in now."
-                                            : ""
-                                    }
-                                </p>
-
-                                <div
-                                    className="divider"
-                                    aria-hidden="true"
-                                >
-                                    <span>OR</span>
-                                </div>
-
-                                <div className="social-buttons-container">
-                                    <button
-                                        type="button"
-                                        className="btn-social google"
-                                    >
-                                        <img
-                                            src={googleLogo}
-                                            alt=""
-                                            width={30}
-                                            height={30}
-                                            aria-hidden="true"
-                                        />
-                                        <span>
-                                            Continue with Google
-                                        </span>
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        className="btn-social facebook"
-                                    >
-                                        <img
-                                            src={facebookLogo}
-                                            alt=""
-                                            width={30}
-                                            height={30}
-                                        />
-                                        <span>
-                                            Continue with Facebook
-                                        </span>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </main>
-        </>
+        </AuthLayout>
     );
+        
 }
 
 export default LoginPage;
