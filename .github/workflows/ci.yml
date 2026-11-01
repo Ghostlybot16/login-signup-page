@@ -1,0 +1,150 @@
+# Continuous integration for login-signup-page
+
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+      - development
+      - "feature/**"
+  
+
+  pull_request:
+    branches:
+      - development
+      - master
+  
+
+  workflow_dispatch:
+
+# Tests only need permission to read repository code.
+permissions:
+  contents: read
+
+
+jobs:
+  # JOB 1: BACKEND AUTHENTICATION TESTS
+
+  backend-tests:
+    name: Backend / pytest
+    runs-on: ubuntu-latest
+
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backEnd/requirements.txt
+            backEnd/requirements-dev.txt
+
+      - name: Install backend test dependencies
+        run: python -m pip install -r backEnd/requirements-dev.txt
+
+      - name: Check Python dependency compatibility
+        run: python -m pip check
+      
+      - name: Run backend authentication tests
+        run: python -m pytest backEnd/tests -v
+
+
+  # Job 2: FRONTEND CODE QUALITY
+  frontend-checks:
+    name: Frontend / lint, build, audit
+    runs-on: ubuntu-latest
+
+
+    defaults:
+      run:
+        working-directory: frontEnd
+    
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
+        with:
+            node-version: "24"
+            cache: npm
+            cache-dependency-path: frontEnd/package-lock.json
+      
+      - name: Install locaked frontend dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Build production frontend
+        run: npm run build
+      
+      - name: Check for high-severity npm advisories
+        run: npm audit --audit-level-high
+
+
+  # Job 3: PLAYWRIGHT BROWSER TESTS 
+  browser-tests:
+    name: Browser / Playwright
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontEnd
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+      
+      # Playwright starts e2e_server.py with Python.
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            backEnd/requirements.txt
+            backEnd/requirements-dev.txt
+      
+      - name: Install test backend dependencies
+        working-directory: .
+        run: python -m pip install -r backEnd/requirements-dev.txt
+
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontEnd/package-lock.json
+
+      - name: Install locked frontend dependencies
+        run: npm ci
+
+      - name: Install Chromium and Linux dependencies
+        run: npx playwright install --with-deps chromium
+
+
+
+      # Playwright starts FastAPI on port 8001
+      # and Vite on port 5173 automatically.
+      - name: Run end-to-end authentication tests
+        run: npm run test:e2e
+
+
+      - name: Upload browser debugging artifacts
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-debug-artifacts
+          path: |
+            frontEnd/playwright-report/
+            frontEnd/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
