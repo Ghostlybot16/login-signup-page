@@ -1,0 +1,11 @@
+-r requirements.txt 
+
+# Backend testing dependencies
+pytest>=8,<10
+httpx>=0.27,<1
+
+# Temporary compatibility pin:
+# Older Starlette TestClient versions use an AnyIO
+# alias deprecated starting in AnyIO 4.15.
+# Remove after upgrading FastAPI and Starlette.
+anyio>=4,<4.15
