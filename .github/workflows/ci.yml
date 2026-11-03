@@ -86,7 +86,7 @@ jobs:
         run: npm run build
       
       - name: Check for high-severity npm advisories
-        run: npm audit --audit-level-high
+        run: npm audit --audit-level=high
 
 
   # Job 3: PLAYWRIGHT BROWSER TESTS 

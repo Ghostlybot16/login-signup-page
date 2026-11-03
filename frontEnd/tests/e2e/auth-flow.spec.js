@@ -83,29 +83,73 @@ test.describe('Complete authentication workflow', () => {
                 await expect(page).toHaveURL(
                     (url) => url.pathname === "/login"
                 );
+
+                // Verify the new login component has rendered,
+                // not just that the browser URL has changed. 
+                await expect(
+                    page.getByRole("heading", {
+                        name: "Log in",
+                        exact: true,
+                    })
+                ).toBeVisible();
+
+                await expect(
+                    page.getByRole("button", {
+                        name: "Log in",
+                        exact: true,
+                    })
+                ).toBeEnabled();
             });
 
+            // Log in using the account created during signup
             await test.step("Log in with the new account", async () => {
-                await page.getByLabel("Email").fill(user.email);
+                // Ensure React has rendered the login page.
+                await expect(
+                    page.getByRole("heading", {
+                        name: "Log in",
+                        exact: true,
+                    })
+                ).toBeVisible();
 
-                await page.locator(
-                    'input[type="password"]'
-                ).fill(user.password);
+                const loginButton = page.getByRole("button", {
+                    name: "Log in",
+                    exact: true,
+                });
 
-                const loginResponsePromise = page.waitForResponse(
-                    (response) =>
-                        response.url().endsWith("/api/users/login") &&
-                        response.request().method() === "POST"
+                // Locate the email field by its visible label
+                const emailInput = page.getByLabel("Email Address");
+
+                // Locate the Mantine password input using it's 
+                // stable name attribute
+                const passwordInput = page.locator(
+                    'form input[name="password"]'
                 );
 
-                await page.locator(
-                    'form button[type="submit"]'
-                ).click();
+                // Enter the registered account credentials 
+                await emailInput.fill(user.email);
+                await passwordInput.fill(user.password);
 
-                const loginResponse = await loginResponsePromise;
+                // Verify the form contains the expected values.
+                await expect(emailInput).toHaveValue(user.email);
+                await expect(passwordInput).toHaveValue(user.password);
 
+                await expect(loginButton).toBeEnabled();
+
+                // Register the response listener before clicking.
+                // Promise.all waits for both submission and response.
+                const [loginResponse] = await Promise.all([
+                    page.waitForResponse(
+                        (response) =>
+                            response.url().endsWith("/api/users/login") &&
+                            response.request().method() === "POST"
+                    ),
+                    loginButton.click(),
+                ]);
+
+                // Verify that FastAPI accepted the credentials
                 expect(loginResponse.status()).toBe(200);
 
+                // Successful login redirects to the dashboard.
                 await expect(page).toHaveURL(
                     "http://127.0.0.1:5173/dashboard"
                 );
