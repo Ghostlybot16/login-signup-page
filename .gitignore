@@ -1,9 +1,14 @@
 # Ignore python venv directory
 backEnd/venv
+venv
+
+# Ignore llms.txt file 
+llms.txt
 
 #Ignore pycache files 
 backEnd/__pycache__/
 backEnd/routers/__pycache__/
+backEnd/tests/__pycache__/
 
 # Ignore DB creation files 
 backEnd/users.db

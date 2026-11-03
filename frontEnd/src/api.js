@@ -1,20 +1,14 @@
-const API_BASE = window.ENV?.API_BASE;
-
-if (!API_BASE) {
-    throw new Error(
-        "API_BASE is not configured. Check config.js."
-    );
-}
+const API_BASE =
+    import.meta.env.VITE_API_BASE_URL
+    || "http://127.0.0.1:8000";
 
 function getErrorMessage(data, status) {
     const detail = data?.detail;
 
-    // Standard FastAPI HTTPException response
     if (typeof detail === "string") {
         return detail;
     }
 
-    // FastAPI/Pydantic validation errors
     if (Array.isArray(detail)) {
         const messages = detail
             .map((error) => error?.msg)
@@ -29,13 +23,14 @@ function getErrorMessage(data, status) {
 }
 
 
-async function apiFetch(
+export async function apiFetch (
     path,
     {
         method = "GET",
         body,
         token,
     } = {}
+
 ) {
     const headers = {};
 
@@ -66,8 +61,6 @@ async function apiFetch(
             "Unable to connect to the server. Please try again."
         );
 
-        // status 0 represents a network-level failure,
-        // not an HTTP response from the backend.
         error.status = 0;
         error.cause = cause;
 
@@ -77,13 +70,14 @@ async function apiFetch(
     let data = null;
 
     const contentType =
-        response.headers.get("content-type") || "";
+        response.headers.get("content-type")
+        || "";
     
     if (contentType.includes("application/json")) {
         try {
             data = await response.json();
         } catch {
-            // Invalid or empty JSON response.
+            // Invalid of empty JSON response.
         }
     }
 

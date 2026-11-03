@@ -1,5 +1,13 @@
-from pydantic import BaseModel, EmailStr, Field
+"""Pydantic schemas for user requests and API responses."""
+
 from datetime import datetime 
+
+from pydantic import (
+    BaseModel, 
+    ConfigDict,
+    EmailStr, 
+    Field,
+)
 
 # Request models
 class UserCreate(BaseModel):
@@ -11,20 +19,22 @@ class UserCreate(BaseModel):
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password:  str = Field(min_length=8)
+    password: str = Field(min_length=8)
 
 
 # Response models 
 class UserResponse(BaseModel):
+    """
+    Represent public user information returned by the API.
+    """
+    
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     first_name: str
     last_name: str
     email: EmailStr
     created_at: datetime
-
-    class Config:
-        from_attributes = True
-
 
 # Token response shape 
 class TokenResponse(BaseModel):
